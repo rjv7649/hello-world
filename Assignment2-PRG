@@ -1,0 +1,31 @@
+import random
+import time
+def OTPKey(randomSeed, keySize): #defines the one time pad
+    key=bytearray() #assigns the empty bytearray to the key
+    random.seed(randomSeed) #generates random seed to us in the encryption
+    for i in range(keySize): #finds the key size to then assign numbers
+        key.append(random.randint(0,256)) #assigns bytearray to any number in binary
+    return key
+
+def stringEncryption(OGText,randomSeed): #defines the encryption program
+    cipherText=bytearray() #assigns the empty bytearray to the ciphertext
+    oneTime=OTPKey(randomSeed, len(OGText))
+    for i in range(len(OGText)): #finds the length of the original text to start assigning numbers
+        cipherText.append(ord(OGText[i])^(oneTime[i])) #appends the strings after they have been assigned integers
+    return cipherText
+
+def stringDecryption(encryptedText,randomSeed): #defines the decryption program
+    plainText=bytearray() #assigns the empty bytearray to the plaintext
+    oneTime = OTPKey(randomSeed, len(encryptedText))
+    for i in range(len(encryptedText)): #finds the length of the encrypted text to start assigning nummbers in the list
+        plainText.append(encryptedText[i]^oneTime[i]) #append the plain text numbers to fill the bytearray
+    return plainText
+
+randomseed = int(time.time())
+plain_text= ('Hello from the other side of the galaxy')
+key = OTPKey(randomseed, len(plain_text))
+enc_data = stringEncryption(plain_text,randomseed) #runs the program to encrypt the original text with the seed
+dec_data = stringDecryption(enc_data,randomseed) #runs the program to decrypt the encrypted text with the seed
+print('Original Text: ',plain_text) #runs the program to print the original text that is inputted
+print('Encrypted Text: ',enc_data) #runs the program to print the original text after encryption
+print('Decrypted Text: ',dec_data.decode()) #runs the program to decrypt the encrypted original text

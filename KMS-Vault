@@ -1,0 +1,33 @@
+import os
+import base64
+
+
+def setEnvVar():
+    os.environ['VAULT_ADDR']="http://127.0.0.1:8200"
+    os.environ['VAULT_TOKEN']="hvs.TMEaFeUWZUI9XbPbcyYL7j96"
+
+
+def enableTransitEngine():
+    os.system("vault secrets enable transit")
+
+
+def createKey():
+    key_name = 'my_key'
+    os.system("vault write transit/keys/{} type=aes256-gcm96".format(key_name))
+
+
+def decodeMessage(cipher, key):
+    os.system("vault write transit/decrypt/{} ciphertext={}".format(key,cipher))
+
+
+def encryptMessage(plain, key):
+    plain_text = base64.b64encode(bytes(plain, 'utf-8'))
+    os.system("vault write transit/encrypt/{} plaintext={}".format(key, plain_text.decode('utf-8')))
+
+setEnvVar()
+enableTransitEngine()
+createKey()
+encryptMessage('hello from python', 'my_key')
+decodeMessage('vault:v1:SI4a8DMSygl7gSjjttU73XYN59PlCAByXQelxBbUx5HllmWCOfV9tGT3zJ/f', 'my_key')
+original_text = base64.b64decode('aGVsbG8gZnJvbSBweXRob24=')
+print(original_text.decode())
